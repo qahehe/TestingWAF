@@ -10,3 +10,9 @@ python3 main2.py
 <img width="1160" height="828" alt="image" src="https://github.com/user-attachments/assets/b64acc67-a851-4471-a7d2-ed7b1f07d56a" />
 
 # to-do-lists
+<ul>
+<li>自动化Payload生成-结合AI </li>
+<li>绕过方法组合添加至poclist里</li>
+<li>代理池能力</li>
+<li>...</li>
+</ul>
